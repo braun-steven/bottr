@@ -5,6 +5,15 @@ bottr
 Bottr is supposed to make writing bots for reddit easy. It relies on the `Python Reddit API Wrapper`
 `PRAW <http://praw.readthedocs.io/en/latest/index.html>`_.
 
+Documentation: `bottr.readthedocs.io <https://bottr.readthedocs.io>`_
+
+Installation
+------------
+Bottr is available on PyPi and can be installed via
+
+.. code:: bash
+
+    $ pip install bottr
 
 Quick Start
 -----------
