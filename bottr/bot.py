@@ -174,9 +174,7 @@ class CommentBot(AbstractCommentBot):
     Creates a bot that listens to comments in a list of subreddits and calls a given
     function on each new comment.
 
-    :param reddit: :class:`praw.Reddit` instance. Check `here
-        <http://praw.readthedocs.io/en/latest/code_overview/reddit_instance.html#praw.Reddit>`_
-        on how to create it.
+    :param reddit: :class:`praw.Reddit` instance. Check :ref:`setup` on how to create it.
     :param name: Bot name
     :param func_comment: Comment function. It needs to accept a :class:`praw.models.Comment`
         object and may take more arguments. For each comment created in :code:`subreddits`, a
