@@ -36,5 +36,5 @@ For the above example, a reddit instance can be created as follows:
                          user_agent='Script by u/test-bot',
                          username='test-bot')
 
-Check out `Script Application <http://praw.readthedocs.io/en/latest/getting_started/authentication.html#script-application>`_
+Check out `Authenticating via OAuth <http://praw.readthedocs.io/en/latest/getting_started/authentication.html#>`_
 in the PRAW documentation for further details.
