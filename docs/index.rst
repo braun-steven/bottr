@@ -6,55 +6,58 @@
 Welcome to bottr's documentation!
 =================================
 
+Bottr is supposed to make writing bots for reddit easy. It relies on the `Python Reddit API Wrapper`
+`PRAW <http://praw.readthedocs.io/en/latest/index.html>`_.
+
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   intro
+   setup
+   bots
+   util
 
 
-Quick Example
--------------
 
-This is a quick example::
+Quick Start
+-----------
+
+The following is a quick example on how to monitor `r/AskReddit` for new comments. If a comment
+contains the string :code:`'banana'`, the bot replies :code:`'This comment is bananas'`::
+
+   import praw
 
    def parse_comment(comment):
        """Define what to do with a comment"""
        if 'banana' in comment.body:
            comment.reply('This comment is bananas.')
 
-   def parse_submission(submission):
-       """Define what to do with a submission"""
-       if 'banana' in submission.title:
-           comment.reply('This submission is bananas.')
-
-
    if __name__ == '__main__':
+
        # Get reddit instance with login details
        reddit = praw.Reddit(client_id='id',
                             client_secret='secret'',
-                            password='userpassword',
+                            password='botpassword',
                             user_agent='Script by /u/...',
                             username='botname')
 
-       # Create Bot with methods to parse comments/submission
-       bot = RedditBot(reddit=reddit,
+       # Create Bot with methods to parse comments
+       bot = CommentBot(reddit=reddit,
                        func_comment=parse_comment,
-                       func_submission=parse_submission,
-                       subs=["AskReddit"])
+                       subreddits=['AskReddit'])
 
        # Start Bot
        bot.start()
 
-       # Run bot for 10 seconds
+       # Run bot for 10 minutes
        time.sleep(10*60)
 
        # Stop Bot
        bot.stop()
 
-Indices and tables
-==================
+Check out :ref:`setup` to see how to get the arguments for :class:`praw.Reddit`.
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. note::
+   Please read the reddit `bottiquette <https://www.reddit.com/wiki/bottiquette>`_ if you intend to
+   run a bot that interacts with reddit, such as writing submissions/comments etc.
