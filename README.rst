@@ -29,6 +29,8 @@ contains the string :code:`'banana'`, the bot replies :code:`'This comment is ba
 .. code:: python
 
    import praw
+   import time
+
    from bottr.bot import CommentBot
 
    def parse_comment(comment):

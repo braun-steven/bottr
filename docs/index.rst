@@ -27,6 +27,8 @@ The following is a quick example on how to monitor `r/AskReddit` for new comment
 contains the string :code:`'banana'`, the bot replies :code:`'This comment is bananas.'`::
 
    import praw
+   import time
+
    from bottr.bot import CommentBot
 
    def parse_comment(comment):
