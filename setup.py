@@ -7,7 +7,7 @@ def readme():
 
 
 setup(name='bottr',
-      version='0.1.1',
+      version='0.1.2',
       description='Simple Reddit Bot Library',
       long_description=readme(),
       url='http://github.com/slang03/bottr',
