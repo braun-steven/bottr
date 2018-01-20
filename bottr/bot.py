@@ -1,5 +1,6 @@
 import logging
 import threading
+import time
 from abc import ABC, abstractmethod
 from queue import Queue
 from typing import Iterable, List, Callable
@@ -70,7 +71,6 @@ class AbstractBot(ABC):
 
 
 class AbstractCommentBot(AbstractBot):
-
     @abstractmethod
     def _process_comment(self, comment: praw.models.Comment):
         """Process a single comment"""
@@ -83,25 +83,36 @@ class AbstractCommentBot(AbstractBot):
 
         threads = []  # type: List[BotQueueWorker]
 
-        # Create n_jobs CommentsThreads
-        for i in range(self._n_jobs):
-            t = BotQueueWorker(name='CommentThread-t-{}'.format(i),
-                               jobs=comments_queue,
-                               target=self._process_comment)
-            t.start()
-            threads.append(t)
+        try:
 
-        # Iterate over all comments in the comment stream
-        for comment in self._reddit.subreddit('+'.join(self._subs)).stream.comments():
+            # Create n_jobs CommentsThreads
+            for i in range(self._n_jobs):
+                t = BotQueueWorker(name='CommentThread-t-{}'.format(i),
+                                   jobs=comments_queue,
+                                   target=self._process_comment)
+                t.start()
+                threads.append(t)
 
-            # Check for stopping
-            if self._stop:
-                self._do_stop(comments_queue, threads)
-                break
+            # Iterate over all comments in the comment stream
+            for comment in self._reddit.subreddit('+'.join(self._subs)).stream.comments():
 
-            comments_queue.put(comment)
+                # Check for stopping
+                if self._stop:
+                    self._do_stop(comments_queue, threads)
+                    break
 
-        self.log.debug('Listen comments stopped')
+                comments_queue.put(comment)
+
+            self.log.debug('Listen comments stopped')
+        except Exception as e:
+            self._do_stop(comments_queue, threads)
+            self.log.error('Exception while listening to comments:')
+            self.log.error(str(e))
+            self.log.error('Waiting for 10 minutes and trying again.')
+            time.sleep(10 * 60)
+
+            # Retry
+            self._listen_comments()
 
     def start(self):
         """
@@ -118,7 +129,6 @@ class AbstractCommentBot(AbstractBot):
 
 
 class AbstractSubmissionBot(AbstractBot):
-
     @abstractmethod
     def _process_submission(self, submission: praw.models.Submission):
         """Process a single submission"""
@@ -131,25 +141,35 @@ class AbstractSubmissionBot(AbstractBot):
 
         threads = []  # type: List[BotQueueWorker]
 
-        # Create n_jobs SubmissionThreads
-        for i in range(self._n_jobs):
-            t = BotQueueWorker(name='SubmissionThread-t-{}'.format(i),
-                               jobs=subs_queue,
-                               target=self._process_submission)
-            t.start()
-            self._threads.append(t)
+        try:
+            # Create n_jobs SubmissionThreads
+            for i in range(self._n_jobs):
+                t = BotQueueWorker(name='SubmissionThread-t-{}'.format(i),
+                                   jobs=subs_queue,
+                                   target=self._process_submission)
+                t.start()
+                self._threads.append(t)
 
-        # Iterate over all comments in the comment stream
-        for submission in self._reddit.subreddit('+'.join(self._subs)).stream.submissions():
+            # Iterate over all comments in the comment stream
+            for submission in self._reddit.subreddit('+'.join(self._subs)).stream.submissions():
 
-            # Check for stopping
-            if self._stop:
-                self._do_stop(subs_queue, threads)
-                break
+                # Check for stopping
+                if self._stop:
+                    self._do_stop(subs_queue, threads)
+                    break
 
-            subs_queue.put(submission)
+                subs_queue.put(submission)
 
-        self.log.debug('Listen submissions stopped')
+            self.log.debug('Listen submissions stopped')
+        except Exception as e:
+            self._do_stop(subs_queue, threads)
+            self.log.error('Exception while listening to submissions:')
+            self.log.error(str(e))
+            self.log.error('Waiting for 10 minutes and trying again.')
+            time.sleep(10 * 60)
+
+            # Retry:
+            self._listen_submissions()
 
     def start(self):
         """
