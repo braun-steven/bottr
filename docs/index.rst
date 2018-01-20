@@ -24,9 +24,10 @@ Quick Start
 -----------
 
 The following is a quick example on how to monitor `r/AskReddit` for new comments. If a comment
-contains the string :code:`'banana'`, the bot replies :code:`'This comment is bananas'`::
+contains the string :code:`'banana'`, the bot replies :code:`'This comment is bananas.'`::
 
    import praw
+   from bottr.bot import CommentBot
 
    def parse_comment(comment):
        """Define what to do with a comment"""
@@ -37,7 +38,7 @@ contains the string :code:`'banana'`, the bot replies :code:`'This comment is ba
 
        # Get reddit instance with login details
        reddit = praw.Reddit(client_id='id',
-                            client_secret='secret'',
+                            client_secret='secret',
                             password='botpassword',
                             user_agent='Script by /u/...',
                             username='botname')
