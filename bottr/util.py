@@ -40,14 +40,18 @@ def handle_rate_limit(func: Callable[[Any], Any], *args, **kwargs) -> Any:
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            if error_count > 10:
-                util_logger.error('Retried to call <{}> 10 times without success. '
-                              'Continuing without calling it.'.format(func.__name__))
+            if error_count > 3:
+                util_logger.error('Retried to call <{}> 3 times without success. '
+                                  'Continuing without calling it.'.format(func.__name__))
                 break
-            util_logger.error(e)
+
+            if 'DELETED_COMMENT' in str(e):
+                util_logger.warning('The comment has been deleted. '
+                                    'Function <{}> was not executed.'.format(func.__name__))
+                break
             wait = parse_wait_time(str(e))
-            util_logger.warning('Waiting ~{} minutes'.format(round(float(wait + 30) /
-                                                                   60)))
+            util_logger.error(e)
+            util_logger.warning('Waiting ~{} minutes'.format(round(float(wait + 30) / 60)))
             time.sleep(wait + 30)
             error_count += 1
 
