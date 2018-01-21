@@ -89,7 +89,7 @@ def init_reddit(creds_path='creds.props') -> praw.Reddit:
         username=USERNAME
     """
     with open(creds_path) as f:
-        prop_lines = [l[:-1].split('=') for l in f.readlines()]
+        prop_lines = [l.replace('\n','').split('=') for l in f.readlines()]
         f.close()
         props = {l[0]: l[1] for l in prop_lines}
         return praw.Reddit(**props)
@@ -113,8 +113,8 @@ def get_subs(subs_file='subreddits.txt', blacklist_file='blacklist.txt') -> List
     # Get subs and blacklisted subs
     subsf = open(subs_file)
     blacklf = open(blacklist_file)
-    subs = [b.lower()[:-1] for b in subsf.readlines()]
-    blacklisted = [b.lower()[:-1] for b in blacklf.readlines()]
+    subs = [b.lower().replace('\n','') for b in subsf.readlines()]
+    blacklisted = [b.lower().replace('\n','') for b in blacklf.readlines()]
     subsf.close()
     blacklf.close()
 

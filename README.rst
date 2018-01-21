@@ -12,6 +12,8 @@ Bottr makes use of the `Python Reddit API Wrapper`
 
 Documentation: `bottr.readthedocs.io <https://bottr.readthedocs.io>`_
 
+Check out [bottr-template](https://github.com/slang03/bottr-template) for a convenient code template to start with.
+
 Installation
 ------------
 Bottr is available on PyPi and can be installed via

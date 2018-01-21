@@ -18,7 +18,7 @@ Bottr is supposed to make writing bots for reddit easy. It relies on the `Python
    bots
    util
 
-
+Check out [bottr-template](https://github.com/slang03/bottr-template) for a convenient code template to start with.
 
 Quick Start
 -----------
