@@ -2,17 +2,18 @@
 bottr
 =====
 
-Bottr makes writing bots for reddit easy. It currently provides two predefined bots:
+Bottr makes writing bots for reddit easy. It currently provides three predefined bots:
 
 :CommentBot: Listens to new comments in a list of subreddits
 :SubmissionBot: Listens to new submission in a list of subreddits
+:MessageBot: Listens to new messages of the inbox
 
 Bottr makes use of the `Python Reddit API Wrapper`
 `PRAW <http://praw.readthedocs.io/en/latest/index.html>`_.
 
 Documentation: `bottr.readthedocs.io <https://bottr.readthedocs.io>`_
 
-Check out [bottr-template](https://github.com/slang03/bottr-template) for a convenient code template to start with.
+Check out `bottr-template <https://github.com/slang03/bottr-template>`_ for a convenient code template to start with.
 
 Installation
 ------------
@@ -21,6 +22,8 @@ Bottr is available on PyPi and can be installed via
 .. code:: bash
 
     $ pip install bottr
+
+:Latest version: :code:`0.1.4`
 
 Quick Start
 -----------
