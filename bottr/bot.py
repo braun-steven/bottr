@@ -16,7 +16,7 @@ class AbstractBot(ABC):
     def __init__(self, reddit: praw.Reddit,
                  subreddits: Iterable = None,
                  name: str = "AbstractBot",
-                 n_jobs=4, ):
+                 n_jobs=4):
         """
         Default constructor
 
@@ -185,6 +185,73 @@ class AbstractSubmissionBot(AbstractBot):
         self.log.info('Starting submissions stream ...')
 
 
+class AbstractMessageBot(AbstractBot):
+    def __init__(self, reddit: praw.Reddit,
+                 name: str = "AbstractInboxBot",
+                 n_jobs=1):
+        """
+        Default constructor
+
+        :param reddit: Reddit instance
+        :param n_jobs: Number of jobs for parallelization
+        """
+        super().__init__(reddit=reddit, name=name, n_jobs=n_jobs)
+
+    @abstractmethod
+    def _process_inbox_message(self, submission: praw.models.Message):
+        """Process a single message"""
+        pass
+
+    def _listen_inbox_messages(self):
+        """Start listening to messages, using a separate thread."""
+        # Collect messages in a queue
+        inbox_queue = Queue(maxsize=self._n_jobs * 4)
+
+        threads = []  # type: List[BotQueueWorker]
+
+        try:
+            # Create n_jobs inbox threads
+            for i in range(self._n_jobs):
+                t = BotQueueWorker(name='InboxThread-t-{}'.format(i),
+                                   jobs=inbox_queue,
+                                   target=self._process_inbox_message)
+                t.start()
+                self._threads.append(t)
+
+            # Iterate over all messages in the messages stream
+            for message in self._reddit.inbox.stream():
+                # Check for stopping
+                if self._stop:
+                    self._do_stop(inbox_queue, threads)
+                    break
+
+                inbox_queue.put(message)
+
+            self.log.debug('Listen inbox stopped')
+        except Exception as e:
+            self._do_stop(inbox_queue, threads)
+            self.log.error('Exception while listening to inbox:')
+            self.log.error(str(e))
+            self.log.error('Waiting for 10 minutes and trying again.')
+            time.sleep(10 * 60)
+
+            # Retry:
+            self._listen_inbox_messages()
+
+    def start(self):
+        """
+        Starts this bot in a separate thread. Therefore, this call is non-blocking.
+
+        It will listen to all new inbox messages created.
+        """
+        super().start()
+        inbox_thread = BotThread(name='{}-inbox-stream-thread'.format(self._name),
+                                 target=self._listen_inbox_messages)
+        inbox_thread.start()
+        self._threads.append(inbox_thread)
+        self.log.info('Starting inbox stream ...')
+
+
 class CommentBot(AbstractCommentBot):
     """
     This bot listens to incoming comments and calls the provided method :code:`func_comment` as
@@ -241,6 +308,57 @@ class CommentBot(AbstractCommentBot):
         :param comment: Comment to process
         """
         self._func_comment(comment, *self._func_comment_args)
+
+
+class MessageBot(AbstractMessageBot):
+    """
+    This bot listens to incoming inbox messages and calls the provided method :code:`func_message` as
+    :code:`func_message(message, *func_message_args)` for each :code:`message` that is new in the inbox.
+
+    :param reddit: :class:`praw.Reddit` instance. Check :ref:`setup` on how to create it.
+    :param name: Bot name
+    :param func_message: Message function. It needs to accept a :class:`praw.models.Message`
+        object and may take more arguments. For each new message in the inbox, a
+        :class:`praw.models.Message` object and all :code:`fun_message_args` are passed to
+        :code:`func_message` as arguments.
+    :param func_message_args: Message function arguments.
+    :param n_jobs: Number of parallel threads that are started when calling
+        :func:`~MessageBot.start` to process in the incoming messages.
+
+    **Example usage**::
+
+        # Write a parsing method
+        def parse(message):
+           message.reply('Hello you!')
+
+        reddit = praw.Reddit(...) # Create a PRAW Reddit instance
+        bot = MessageBot(reddit=reddit, func_message=parse)
+        bot.start()
+
+    """
+
+    def __init__(self, reddit: praw.Reddit,
+                 name: str = "InboxBot",
+                 func_message: Callable[[praw.models.Message], None] = None,
+                 func_message_args: List = None,
+                 n_jobs=1):
+        super().__init__(reddit=reddit, name=name, n_jobs=n_jobs)
+
+        # Enable comment processing if proper method was given
+        if func_message is not None:
+            if func_message_args is None:
+                func_message_args = []
+
+            self._func_message = func_message
+            self._func_message_args = func_message_args
+
+    def _process_inbox_message(self, message: praw.models.Message):
+        """
+        Process a reddit inbox message. Calls `func_message(message, *func_message_args)`.
+
+        :param message: Item to process
+        """
+        self._func_message(message, *self._func_message_args)
 
 
 class SubmissionBot(AbstractSubmissionBot):
