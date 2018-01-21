@@ -1,7 +1,7 @@
 import logging
 import re
 import time
-from typing import Callable, Any
+from typing import Callable, Any, List
 
 import praw
 
@@ -73,3 +73,51 @@ def check_comment_depth(comment: praw.models.Comment, max_depth=3) -> bool:
         comment = comment.parent()
 
     return True
+
+
+def init_reddit(creds_path='creds.props') -> praw.Reddit:
+    """Initialize the reddit session by reading the credentials from the file at :code:`creds_path`.
+
+    :param creds_path: Properties file with the credentials.
+
+    **Example file**::
+
+        client_id=CLIENT_ID
+        client_secret=CLIENT_SECRET
+        password=PASSWORD
+        user_agent=USER_AGENT
+        username=USERNAME
+    """
+    with open(creds_path) as f:
+        prop_lines = [l[:-1].split('=') for l in f.readlines()]
+        f.close()
+        props = {l[0]: l[1] for l in prop_lines}
+        return praw.Reddit(**props)
+
+
+def get_subs(subs_file='subreddits.txt', blacklist_file='blacklist.txt') -> List[str]:
+    """
+    Get subs based on a file of subreddits and a file of blacklisted subreddits.
+
+    :param subs_file: List of subreddits. Each sub in a new line.
+    :param blacklist_file:  List of blacklisted subreddits. Each sub in a new line.
+    :return: List of subreddits filtered with the blacklisted subs.
+
+    **Example files**::
+
+        sub0
+        sub1
+        sub2
+        ...
+    """
+    # Get subs and blacklisted subs
+    subsf = open(subs_file)
+    blacklf = open(blacklist_file)
+    subs = [b.lower()[:-1] for b in subsf.readlines()]
+    blacklisted = [b.lower()[:-1] for b in blacklf.readlines()]
+    subsf.close()
+    blacklf.close()
+
+    # Filter blacklisted
+    subs_filtered = list(sorted(set(subs).difference(set(blacklisted))))
+    return subs_filtered
