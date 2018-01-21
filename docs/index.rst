@@ -11,7 +11,7 @@ Bottr is supposed to make writing bots for reddit easy. It relies on the `Python
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
    setup

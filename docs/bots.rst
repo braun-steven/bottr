@@ -3,14 +3,10 @@
 Predefined Bots
 ===============
 
-
-* :ref:`comment_bot`
-* :ref:`submission_bot`
-
 Description
 -----------
 
-Bottr comes with two predefined bots, :class:`CommentBot` and :class:`SubmissionBot`.
+Bottr comes with a set of predefined bots, e.g. :class:`CommentBot` or :class:`SubmissionBot`.
 Both bots accepts a function as constructor argument. The bots listen to a stream of new
 comments/submissions and call the given function with a :class:`praw.models.Comment` or
 :class:`praw.models.Submission` object respectively.
@@ -23,27 +19,12 @@ The stream of new comments/submissions are internally put into a :class:`~queue.
 available to a list of worker threads that successively poll new objects to process from the queue.
 The :code:`n_jobs` argument defines how many worker threads are available.
 
-Bot Objects
------------
+Bots
+----
 
-.. _comment_bot:
+.. toctree::
+   :maxdepth: 3
 
-Comment Bot
-***********
-
-.. autoclass:: bottr.bot.CommentBot
-    :members:
-    :inherited-members:
-    :special-members: __init__
-
-
-.. _submission_bot:
-
-Submission Bot
-**************
-
-.. autoclass:: bottr.bot.SubmissionBot
-    :members:
-    :inherited-members:
-    :special-members: __init__
-
+   bots/comment
+   bots/submission
+   bots/message
