@@ -1,5 +1,5 @@
 =====
-bottr
+Bottr
 =====
 
 Bottr makes writing bots for reddit easy. It currently provides three predefined bots:
