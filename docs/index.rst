@@ -24,7 +24,9 @@ Quick Start
 -----------
 
 The following is a quick example on how to monitor `r/AskReddit` for new comments. If a comment
-contains the string :code:`'banana'`, the bot replies :code:`'This comment is bananas.'`::
+contains the string :code:`'banana'`, the bot replies :code:`'This comment is bananas.'`:
+
+.. code:: python
 
    import praw
    import time
