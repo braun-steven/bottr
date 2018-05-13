@@ -24,7 +24,7 @@ Quick Start
 -----------
 
 The following is a quick example on how to monitor `r/AskReddit` for new comments. If a comment
-contains the string :code:`'banana'`, the bot replies :code:`'This comment is bananas.'`:
+contains the string :code:`'banana'`, the bot prints the comment information:
 
 .. code:: python
 
@@ -36,7 +36,9 @@ contains the string :code:`'banana'`, the bot replies :code:`'This comment is ba
    def parse_comment(comment):
        """Define what to do with a comment"""
        if 'banana' in comment.body:
-           comment.reply('This comment is bananas.')
+           print('ID: {}'.format(comment.id))
+           print('Author: {}'.format(comment.author))
+           print('Body: {}'.format(comment.body))
 
    if __name__ == '__main__':
 
